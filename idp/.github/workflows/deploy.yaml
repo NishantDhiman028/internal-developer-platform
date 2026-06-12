@@ -1,0 +1,37 @@
+name: Deploy - Trigger ArgoCD Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - 'golden-paths/**'
+    - 'argocd/**'
+    - 'crossplane/**'
+
+jobs:
+  deploy:
+    name: Trigger GitOps Sync
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install ArgoCD CLI
+      run: |
+        curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x argocd
+        sudo mv argocd /usr/local/bin/
+
+    - name: Sync ArgoCD Applications
+      env:
+        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+        ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+      run: |
+        argocd app sync idp-platform --auth-token $ARGOCD_TOKEN --server $ARGOCD_SERVER --insecure
+        argocd app wait idp-platform --auth-token $ARGOCD_TOKEN --server $ARGOCD_SERVER --insecure --timeout 300
+
+    - name: Post deployment summary
+      run: |
+        echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Triggered by: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Time: $(date -u)" >> $GITHUB_STEP_SUMMARY

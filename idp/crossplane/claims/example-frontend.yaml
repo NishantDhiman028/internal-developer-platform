@@ -1,0 +1,13 @@
+apiVersion: platform.idp.io/v1alpha1
+kind: AppEnvironmentClaim
+metadata:
+  name: checkout-frontend-dev
+  namespace: dev-team-b
+spec:
+  team: checkout-team
+  environment: dev
+  template: frontend-app
+  resources:
+    database: none
+    cache: redis-micro
+    compute: standard-1

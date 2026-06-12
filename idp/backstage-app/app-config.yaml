@@ -1,0 +1,55 @@
+app:
+  title: Internal Developer Platform
+  baseUrl: http://localhost:3000
+
+organization:
+  name: Your Company IDP
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+
+auth:
+  environment: development
+  providers: {}
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location, Template]
+  locations:
+    - type: file
+      target: ../../catalog/catalog-info.yaml
+    - type: file
+      target: ../../golden-paths/nodejs-service/template.yaml
+    - type: file
+      target: ../../golden-paths/python-service/template.yaml
+    - type: file
+      target: ../../golden-paths/frontend-app/template.yaml
+
+scaffolder: {}
+
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'docker'
+  publisher:
+    type: 'local'
+
+kubernetes:
+  serviceLocatorMethod:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+    - type: 'config'
+      clusters:
+        - url: http://127.0.0.1:8001
+          name: local
+          authProvider: 'serviceAccount'
+          skipTLSVerify: false
+          skipMetricsLookup: true

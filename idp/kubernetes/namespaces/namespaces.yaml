@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backstage
+  labels:
+    managed-by: idp
+    component: platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-team-a
+  labels:
+    managed-by: idp
+    team: team-a
+    environment: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-team-b
+  labels:
+    managed-by: idp
+    team: team-b
+    environment: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    managed-by: idp
+    environment: staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+  labels:
+    managed-by: idp
+    environment: production

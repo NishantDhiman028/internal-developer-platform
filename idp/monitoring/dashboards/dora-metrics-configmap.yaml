@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dora-metrics-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  dora-metrics.json: |
+    {
+      "title": "DORA Metrics - Internal Developer Platform",
+      "uid": "idp-dora",
+      "tags": ["idp", "dora", "platform"],
+      "time": {"from": "now-30d", "to": "now"},
+      "panels": [
+        {
+          "id": 1,
+          "title": "Deployment Frequency (last 7 days)",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+          "targets": [{
+            "expr": "count(increase(argocd_app_sync_total{phase='Succeeded'}[7d]))",
+            "legendFormat": "Deployments"
+          }],
+          "options": {
+            "reduceOptions": {"calcs": ["lastNotNull"]},
+            "colorMode": "background",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "green", "value": 7}
+              ]
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "Change Failure Rate (%)",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+          "targets": [{
+            "expr": "100 * sum(increase(argocd_app_sync_total{phase='Failed'}[30d])) / sum(increase(argocd_app_sync_total[30d]))",
+            "legendFormat": "Failure Rate"
+          }],
+          "options": {
+            "colorMode": "background",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 15}
+              ]
+            }
+          }
+        },
+        {
+          "id": 3,
+          "title": "Deployment Frequency Over Time",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+          "targets": [{
+            "expr": "sum(increase(argocd_app_sync_total{phase='Succeeded'}[1d])) by (day)",
+            "legendFormat": "Successful Deployments"
+          }]
+        },
+        {
+          "id": 4,
+          "title": "Sync Status by Application",
+          "type": "table",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+          "targets": [{
+            "expr": "argocd_app_info",
+            "legendFormat": "{{name}}"
+          }]
+        }
+      ]
+    }

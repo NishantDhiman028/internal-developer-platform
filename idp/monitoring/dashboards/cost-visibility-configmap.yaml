@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cost-visibility-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  cost-visibility.json: |
+    {
+      "title": "Infrastructure Cost by Team",
+      "uid": "idp-cost",
+      "tags": ["idp", "cost", "finops"],
+      "panels": [
+        {
+          "id": 1,
+          "title": "CPU Usage by Team (Proxy for Cost)",
+          "type": "piechart",
+          "targets": [{
+            "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (namespace)",
+            "legendFormat": "{{namespace}}"
+          }]
+        },
+        {
+          "id": 2,
+          "title": "Memory Usage by Team",
+          "type": "piechart",
+          "targets": [{
+            "expr": "sum(container_memory_working_set_bytes) by (namespace)",
+            "legendFormat": "{{namespace}}"
+          }]
+        },
+        {
+          "id": 3,
+          "title": "Resource Usage Over Time by Namespace",
+          "type": "timeseries",
+          "targets": [{
+            "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (namespace)",
+            "legendFormat": "{{namespace}}"
+          }]
+        }
+      ]
+    }

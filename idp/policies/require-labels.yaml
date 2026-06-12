@@ -1,0 +1,28 @@
+# All deployments must have team and environment labels
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-idp-labels
+  annotations:
+    policies.kyverno.io/title: Require IDP Labels
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >
+      All deployments must have platform.idp.io/team and 
+      platform.idp.io/environment labels for cost attribution and routing.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: require-team-label
+    match:
+      any:
+      - resources:
+          kinds: ["Deployment"]
+          namespaces: ["dev-*", "staging", "production"]
+    validate:
+      message: "Deployment must have 'platform.idp.io/team' label. Use a Golden Path template."
+      pattern:
+        metadata:
+          labels:
+            platform.idp.io/team: "?*"
+            platform.idp.io/environment: "?*"

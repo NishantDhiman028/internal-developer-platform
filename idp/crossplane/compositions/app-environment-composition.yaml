@@ -1,0 +1,110 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: appenvironments.platform.idp.io
+  labels:
+    provider: kubernetes
+spec:
+  compositeTypeRef:
+    apiVersion: platform.idp.io/v1alpha1
+    kind: AppEnvironment
+  resources:
+  # 1. Create dedicated Kubernetes namespace for this environment
+  - name: namespace
+    base:
+      apiVersion: kubernetes.crossplane.io/v1alpha1
+      kind: Object
+      spec:
+        forProvider:
+          manifest:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              labels:
+                managed-by: crossplane
+                platform.idp.io/team: ""
+                platform.idp.io/environment: ""
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.metadata.name
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-ns"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.metadata.labels["platform.idp.io/team"]
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.environment
+      toFieldPath: spec.forProvider.manifest.metadata.labels["platform.idp.io/environment"]
+
+  # 2. Create ResourceQuota for the namespace
+  - name: resource-quota
+    base:
+      apiVersion: kubernetes.crossplane.io/v1alpha1
+      kind: Object
+      spec:
+        forProvider:
+          manifest:
+            apiVersion: v1
+            kind: ResourceQuota
+            spec:
+              hard:
+                requests.cpu: "2"
+                requests.memory: 4Gi
+                limits.cpu: "4"
+                limits.memory: 8Gi
+                pods: "20"
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.metadata.namespace
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-ns"
+
+  # 3. Create ArgoCD Application for GitOps deployment
+  - name: argocd-application
+    base:
+      apiVersion: kubernetes.crossplane.io/v1alpha1
+      kind: Object
+      spec:
+        forProvider:
+          manifest:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Application
+            metadata:
+              namespace: argocd
+            spec:
+              project: default
+              source:
+                repoURL: "https://github.com/YOUR_ORG/YOUR_REPO"
+                targetRevision: HEAD
+              destination:
+                server: "https://kubernetes.default.svc"
+              syncPolicy:
+                automated:
+                  prune: true
+                  selfHeal: true
+                syncOptions:
+                - CreateNamespace=true
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.metadata.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.spec.source.path
+      transforms:
+      - type: string
+        string:
+          fmt: "services/%s"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.team
+      toFieldPath: spec.forProvider.manifest.spec.destination.namespace
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-ns"

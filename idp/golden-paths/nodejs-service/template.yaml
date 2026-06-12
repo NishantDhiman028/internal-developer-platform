@@ -1,0 +1,115 @@
+# This is what shows up in Backstage "Create" menu
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: nodejs-service-template
+  title: Node.js Microservice
+  description: "Create a production-ready Node.js microservice with CI/CD, observability, and security built-in"
+  tags:
+    - nodejs
+    - microservice
+    - golden-path
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+  - title: Service Details
+    required: [serviceName, team, description]
+    properties:
+      serviceName:
+        title: Service Name
+        type: string
+        description: Unique name for your service (lowercase, hyphens only)
+        pattern: '^[a-z][a-z0-9-]*$'
+        ui:autofocus: true
+      team:
+        title: Team
+        type: string
+        description: Your team name (for namespace and cost attribution)
+        enum: [payments-team, checkout-team, catalog-team, search-team, platform-team]
+      description:
+        title: Description
+        type: string
+        description: Brief description of what this service does
+
+  - title: Infrastructure
+    properties:
+      environment:
+        title: Initial Environment
+        type: string
+        default: dev
+        enum: [dev, staging]
+      database:
+        title: Database
+        type: string
+        default: none
+        enum: [none, postgres-micro, postgres-small]
+        enumNames: ["No database", "PostgreSQL (micro - dev only)", "PostgreSQL (small)"]
+      cache:
+        title: Cache
+        type: string
+        default: none
+        enum: [none, redis-micro]
+        enumNames: ["No cache", "Redis (micro)"]
+
+  - title: Repository
+    required: [repoUrl]
+    properties:
+      repoUrl:
+        title: Repository Location
+        type: string
+        ui:field: RepoUrlPicker
+        ui:options:
+          allowedHosts: [github.com]
+
+  steps:
+  - id: fetch-template
+    name: Fetch Golden Path Template
+    action: fetch:template
+    input:
+      url: ./template
+      values:
+        serviceName: ${{ parameters.serviceName }}
+        team: ${{ parameters.team }}
+        description: ${{ parameters.description }}
+        environment: ${{ parameters.environment }}
+        database: ${{ parameters.database }}
+        cache: ${{ parameters.cache }}
+
+  - id: create-infrastructure-claim
+    name: Create Infrastructure Claim
+    action: fetch:template
+    input:
+      url: ../../crossplane/claims
+      targetPath: ./crossplane-claim
+      values:
+        serviceName: ${{ parameters.serviceName }}
+        team: ${{ parameters.team }}
+        environment: ${{ parameters.environment }}
+        database: ${{ parameters.database }}
+        cache: ${{ parameters.cache }}
+
+  - id: publish
+    name: Publish to GitHub
+    action: publish:github
+    input:
+      allowedHosts: [github.com]
+      description: ${{ parameters.description }}
+      repoUrl: ${{ parameters.repoUrl }}
+      defaultBranch: main
+
+  - id: register
+    name: Register in Catalog
+    action: catalog:register
+    input:
+      repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+      catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+    - title: Repository
+      url: ${{ steps['publish'].output.remoteUrl }}
+    - title: Open in Catalog
+      icon: catalog
+      entityRef: ${{ steps['register'].output.entityRef }}

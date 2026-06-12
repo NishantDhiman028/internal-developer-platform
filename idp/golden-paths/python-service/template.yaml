@@ -1,0 +1,40 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: python-service-template
+  title: Python / FastAPI Service
+  description: "Production-ready Python FastAPI microservice with async support, observability, and security"
+  tags: [python, fastapi, microservice, golden-path]
+spec:
+  owner: platform-team
+  type: service
+  parameters:
+  - title: Service Details
+    required: [serviceName, team]
+    properties:
+      serviceName:
+        title: Service Name
+        type: string
+        pattern: '^[a-z][a-z0-9-]*$'
+      team:
+        title: Team
+        type: string
+        enum: [payments-team, checkout-team, catalog-team, search-team]
+      pythonVersion:
+        title: Python Version
+        type: string
+        default: "3.11"
+        enum: ["3.10", "3.11", "3.12"]
+  steps:
+  - id: fetch
+    name: Fetch Template
+    action: fetch:template
+    input:
+      url: ./template
+      values:
+        serviceName: ${{ parameters.serviceName }}
+        team: ${{ parameters.team }}
+  output:
+    links:
+    - title: Repository
+      url: ${{ steps['publish'].output.remoteUrl }}

@@ -1,0 +1,15 @@
+# Developer applies this ONE file to get a full environment
+# No tickets, no waiting for platform team
+apiVersion: platform.idp.io/v1alpha1
+kind: AppEnvironmentClaim
+metadata:
+  name: payments-service-dev
+  namespace: dev-team-a
+spec:
+  team: payments-team
+  environment: dev
+  template: nodejs-service
+  resources:
+    database: postgres-small
+    cache: redis-micro
+    compute: standard-2

@@ -1,0 +1,36 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: frontend-app-template
+  title: React Frontend Application
+  description: "Production-ready React app with Nginx, CDN config, and CI/CD"
+  tags: [react, frontend, golden-path]
+spec:
+  owner: platform-team
+  type: website
+  parameters:
+  - title: App Details
+    required: [appName, team]
+    properties:
+      appName:
+        title: App Name
+        type: string
+        pattern: '^[a-z][a-z0-9-]*$'
+      team:
+        title: Team
+        type: string
+        enum: [payments-team, checkout-team, catalog-team]
+      framework:
+        title: Framework
+        type: string
+        default: react
+        enum: [react, nextjs]
+  steps:
+  - id: fetch
+    name: Fetch Template
+    action: fetch:template
+    input:
+      url: ./template
+      values:
+        appName: ${{ parameters.appName }}
+        team: ${{ parameters.team }}

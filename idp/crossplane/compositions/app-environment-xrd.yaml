@@ -1,0 +1,62 @@
+# This defines the API that developers use to request infrastructure
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: appenvironments.platform.idp.io
+spec:
+  group: platform.idp.io
+  names:
+    kind: AppEnvironment
+    plural: appenvironments
+  claimNames:
+    kind: AppEnvironmentClaim
+    plural: appenvironmentclaims
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: ["team", "environment", "template"]
+            properties:
+              team:
+                type: string
+                description: "Team name (used for namespace and cost attribution)"
+              environment:
+                type: string
+                enum: ["dev", "staging", "production"]
+                description: "Target environment"
+              template:
+                type: string
+                enum: ["nodejs-service", "python-service", "frontend-app"]
+                description: "Golden path template to use"
+              resources:
+                type: object
+                properties:
+                  database:
+                    type: string
+                    enum: ["none", "postgres-micro", "postgres-small", "postgres-medium"]
+                    default: "none"
+                  cache:
+                    type: string
+                    enum: ["none", "redis-micro", "redis-small"]
+                    default: "none"
+                  compute:
+                    type: string
+                    enum: ["minimal", "standard-1", "standard-2", "standard-4"]
+                    default: "standard-1"
+          status:
+            type: object
+            properties:
+              namespaceReady:
+                type: boolean
+              databaseEndpoint:
+                type: string
+              cacheEndpoint:
+                type: string
+              argocdAppUrl:
+                type: string

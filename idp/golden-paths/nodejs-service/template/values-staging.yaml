@@ -1,0 +1,12 @@
+environment: staging
+replicaCount: 2
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 5
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi

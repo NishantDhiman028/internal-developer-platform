@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: "Internal Developer Platform - managed applications"
+  sourceRepos:
+  - "*"
+  destinations:
+  - namespace: "dev-*"
+    server: "https://kubernetes.default.svc"
+  - namespace: staging
+    server: "https://kubernetes.default.svc"
+  - namespace: production
+    server: "https://kubernetes.default.svc"
+  - namespace: backstage
+    server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+  - group: ""
+    kind: Namespace
+  namespaceResourceWhitelist:
+  - group: "apps"
+    kind: Deployment
+  - group: ""
+    kind: Service
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: Secret
+  - group: "networking.k8s.io"
+    kind: Ingress
+  roles:
+  - name: developer
+    description: "Read-only access for developers"
+    policies:
+    - p, proj:platform:developer, applications, get, platform/*, allow
+    - p, proj:platform:developer, applications, sync, platform/*, allow
+  - name: platform-admin
+    description: "Full access for platform team"
+    policies:
+    - p, proj:platform:platform-admin, applications, *, platform/*, allow
