@@ -1,4 +1,4 @@
-app:
+ app:
   title: Internal Developer Platform
   baseUrl: http://localhost:3000
 
