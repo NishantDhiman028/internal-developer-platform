@@ -1,4 +1,4 @@
-# 🚀 Internal Developer Platform (IDP) on AWS EKS
+#  Internal Developer Platform (IDP) on AWS EKS
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-EKS-326CE5?logo=kubernetes&logoColor=white)](https://aws.amazon.com/eks/)
@@ -11,7 +11,7 @@
 
 ---
 
-## 📌 What Problem Does This Solve?
+##  What Problem Does This Solve?
 
 In most teams, a developer who needs a new S3 bucket or RDS database has to:
 1. Raise a ticket to the infra/DevOps team
@@ -24,7 +24,7 @@ A developer fills out a simple form in the Backstage portal → a Crossplane Cla
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -67,7 +67,7 @@ A developer fills out a simple form in the Backstage portal → a Crossplane Cla
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```
 internal-developer-platform/
@@ -129,7 +129,7 @@ internal-developer-platform/
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer | Tool | Purpose |
 |---|---|---|
@@ -144,7 +144,7 @@ internal-developer-platform/
 
 ---
 
-## ⚡ Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -208,9 +208,9 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 ---
 
-## 🎯 Core Features
+##  Core Features
 
-### ✅ Self-Service Infrastructure via Backstage + Crossplane
+###  Self-Service Infrastructure via Backstage + Crossplane
 
 Developers provision AWS resources through a UI form — no Terraform knowledge needed.
 
@@ -237,7 +237,7 @@ Crossplane controller picks this up and provisions the actual S3 bucket on AWS w
 
 ---
 
-### ✅ Golden Path Templates
+###  Golden Path Templates
 
 Pre-built service templates in Backstage scaffolder — developers create new microservices with all best practices baked in.
 
@@ -254,7 +254,7 @@ Pre-built service templates in Backstage scaffolder — developers create new mi
 
 ---
 
-### ✅ Policy Enforcement with Kyverno
+###  Policy Enforcement with Kyverno
 
 Every resource deployed to EKS is validated against policies **before** it's admitted.
 
@@ -285,7 +285,7 @@ spec:
 
 ---
 
-### ✅ GitOps with ArgoCD (App of Apps Pattern)
+###  GitOps with ArgoCD (App of Apps Pattern)
 
 All platform components and developer workloads managed via ArgoCD.
 
@@ -299,7 +299,7 @@ Any change merged to `main` branch is automatically synced to the cluster within
 
 ---
 
-### ✅ Monitoring & Observability
+###  Monitoring & Observability
 
 Grafana dashboards track:
 - Crossplane resource provisioning status (pending / healthy / failed)
@@ -309,7 +309,7 @@ Grafana dashboards track:
 
 ---
 
-## 🔐 Security Design
+##  Security Design
 
 | Concern | Solution |
 |---|---|
@@ -321,7 +321,7 @@ Grafana dashboards track:
 
 ---
 
-## 🧪 CI Pipeline (GitHub Actions)
+##  CI Pipeline (GitHub Actions)
 
 Every Pull Request triggers:
 
@@ -343,7 +343,7 @@ kyverno apply policies/ --resource golden-paths/nodejs-service/template/template
 
 ---
 
-## 📊 Results & Impact
+##  Results & Impact
 
 | Metric | Before IDP | After IDP |
 |---|---|---|
@@ -355,7 +355,7 @@ kyverno apply policies/ --resource golden-paths/nodejs-service/template/template
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [ ] Add Okta SSO integration for Backstage authentication
 - [ ] Add Cost Estimation plugin to Backstage (show $ before provisioning)
@@ -365,7 +365,7 @@ kyverno apply policies/ --resource golden-paths/nodejs-service/template/template
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guide on:
 - Adding a new Golden Path template
@@ -374,18 +374,18 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guide on:
 
 ---
 
-## 👤 Author
+##  Author
 
 **Nishant Dhiman**
 - GitHub: [@NishantDhiman028](https://github.com/NishantDhiman028)
-- LinkedIn: [Add your LinkedIn URL here]
+- LinkedIn: [https://www.linkedin.com/in/nishantdhiman3011/]
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](./LICENSE) for details.
 
 ---
 
-> ⭐ If this project helped you, please consider giving it a star on GitHub!
+>  If this project helped you, please consider giving it a star on GitHub!
